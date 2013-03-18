@@ -39,15 +39,6 @@ public enum SupplicantState implements Parcelable {
     DISCONNECTED,
 
     /**
-     * Interface is disabled
-     * <p/>
-     * This state is entered if the network interface is disabled.
-     * wpa_supplicant refuses any new operations that would
-     * use the radio until the interface has been enabled.
-     */
-    INTERFACE_DISABLED,
-
-    /**
      * Inactive state (wpa_supplicant disabled).
      * <p/>
      * This state is entered if there are no enabled networks in the
@@ -64,15 +55,6 @@ public enum SupplicantState implements Parcelable {
      * network.
      */
     SCANNING,
-
-    /**
-     * Trying to authenticate with a BSS/SSID
-     * <p/>
-     * This state is entered when wpa_supplicant has found a suitable BSS
-     * to authenticate with and the driver is configured to try to
-     * authenticate with this BSS.
-     */
-    AUTHENTICATING,
 
     /**
      * Trying to associate with a BSS/SSID.
@@ -153,6 +135,9 @@ public enum SupplicantState implements Parcelable {
      * to establish a connection to it.
      */
     UNINITIALIZED,
+
+    INTERFACE_DISABLED,
+    AUTHENTICATING,
 
     /**
      * A pseudo-state that should normally never be seen.
