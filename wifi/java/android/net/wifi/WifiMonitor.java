@@ -662,10 +662,10 @@ public class WifiMonitor {
          */
         private void handleSupplicantStateChange(String dataString) {
             WifiSsid wifiSsid = null;
-            int index = dataString.lastIndexOf("SSID=");
+			int index = dataString.indexOf("SSID=");
             if (index != -1) {
                 wifiSsid = WifiSsid.createFromAsciiEncoded(
-                        dataString.substring(index + 5));
+                        dataString.substring(index));
             }
             String[] dataTokens = dataString.split(" ");
 
