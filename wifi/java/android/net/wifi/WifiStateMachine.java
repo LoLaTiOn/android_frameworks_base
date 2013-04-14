@@ -1570,27 +1570,7 @@ public class WifiStateMachine extends StateMachine {
      * Fetch RSSI and linkspeed on current connection
      */
     private void fetchRssiAndLinkSpeedNative() {
-        int newRssi = -1;
-        int newLinkSpeed = -1;
-
-        String signalPoll = mWifiNative.signalPoll();
-
-        if (signalPoll != null) {
-            String[] lines = signalPoll.split("\n");
-            for (String line : lines) {
-                String[] prop = line.split("=");
-                if (prop.length < 2) continue;
-                try {
-                    if (prop[0].equals("RSSI")) {
-                        newRssi = Integer.parseInt(prop[1]);
-                    } else if (prop[0].equals("LINKSPEED")) {
-                        newLinkSpeed = Integer.parseInt(prop[1]);
-                    }
-                } catch (NumberFormatException e) {
-                    //Ignore, defaults on rssi and linkspeed are assigned
-                }
-            }
-        }
+        int newRssi = mWifiNative.getRssiCommand();
 
         if (newRssi != -1 && MIN_RSSI < newRssi && newRssi < MAX_RSSI) { // screen out invalid values
             /* some implementations avoid negative values by adding 256
@@ -1616,7 +1596,8 @@ public class WifiStateMachine extends StateMachine {
         } else {
             mWifiInfo.setRssi(MIN_RSSI);
         }
-
+		int newLinkSpeed = mWifiNative.getLinkSpeedCommand();
+		
         if (newLinkSpeed != -1) {
             mWifiInfo.setLinkSpeed(newLinkSpeed);
         }

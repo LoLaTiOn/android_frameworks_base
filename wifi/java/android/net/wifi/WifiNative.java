@@ -128,6 +128,25 @@ public class WifiNative {
         }
     }
 
+/* WiFi signal fix */
+    private native static int getRssiCommand(String iface);
+
+    private native static int getRssiApproxCommand(String iface);
+
+    private native static int getLinkSpeedCommand(String iface);
+
+    public int getRssiCommand() {
+        return getRssiCommand(mInterface);
+    }
+
+    public int getRssiApproxCommand() {
+        return getRssiApproxCommand(mInterface);
+    }
+
+    public int getLinkSpeedCommand() {
+        return getLinkSpeedCommand(mInterface);
+    }
+
     /* Does a graceful shutdown of supplicant. Is a common stop function for both p2p and sta.
      *
      * Note that underneath we use a harsh-sounding "terminate" supplicant command

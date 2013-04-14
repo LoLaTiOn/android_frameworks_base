@@ -190,6 +190,63 @@ static jstring android_net_wifi_doStringCommand(JNIEnv* env, jobject, jstring jI
     return doStringCommand(env, ifname.c_str(), "%s", command.c_str());
 }
 
+// WiFi signal
+static jint android_net_wifi_getRssiHelper(const char *cmd, const char *ifname)
+{
+    char reply[BUF_SIZE];
+    int rssi = -200;
+
+    if (doCommand(ifname, cmd, reply, sizeof(reply)) != 0) {
+        return (jint)-1;
+    }
+
+    // reply comes back in the form "<SSID> rssi XX" where XX is the
+    // number we're interested in.  if we're associating, it returns "OK".
+    // beware - <SSID> can contain spaces.
+    if (strcmp(reply, "OK") != 0) {
+        // beware of trailing spaces
+        char* end = reply + strlen(reply);
+        while (end > reply && end[-1] == ' ') {
+            end--;
+        }
+        *end = 0;
+
+        char* lastSpace = strrchr(reply, ' ');
+        // lastSpace should be preceded by "rssi" and followed by the value
+        if (lastSpace && !strncasecmp(lastSpace - 4, "rssi", 4)) {
+            sscanf(lastSpace + 1, "%d", &rssi);
+        }
+    }
+    return (jint)rssi;
+}
+
+static jint android_net_wifi_getRssiCommand(JNIEnv* env, jobject, jstring jIface)
+{
+    ScopedUtfChars ifname(env, jIface);
+    return android_net_wifi_getRssiHelper("DRIVER RSSI", ifname.c_str());
+}
+
+static jint android_net_wifi_getRssiApproxCommand(JNIEnv* env, jobject, jstring jIface)
+{
+    ScopedUtfChars ifname(env, jIface);
+    return android_net_wifi_getRssiHelper("DRIVER RSSI-APPROX", ifname.c_str());
+}
+
+static jint android_net_wifi_getLinkSpeedCommand(JNIEnv* env, jobject, jstring jIface)
+{
+    char reply[BUF_SIZE];
+    int linkspeed;
+    ScopedUtfChars ifname(env, jIface);
+
+    if (doCommand(ifname.c_str(), "DRIVER LINKSPEED", reply, sizeof(reply)) != 0) {
+        return (jint)-1;
+    }
+    // reply comes back in the form "LinkSpeed XX" where XX is the
+    // number we're interested in.
+    sscanf(reply, "%*s %u", &linkspeed);
+    return (jint)linkspeed;
+}
+
 static jboolean android_net_wifi_setMode(JNIEnv* env, jobject, jint type)
 {
     return (jboolean)(::wifi_set_mode(type) == 0);
@@ -220,6 +277,10 @@ static JNINativeMethod gWifiMethods[] = {
             (void*) android_net_wifi_doIntCommand },
     { "doStringCommand", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
             (void*) android_net_wifi_doStringCommand },
+	{ "getRssiCommand", "(Ljava/lang/String;)I", (void*) android_net_wifi_getRssiCommand },
+    { "getRssiApproxCommand", "(Ljava/lang/String;)I",
+            (void*) android_net_wifi_getRssiApproxCommand},
+    { "getLinkSpeedCommand", "(Ljava/lang/String;)I", (void*) android_net_wifi_getLinkSpeedCommand },
     { "setMode", "(I)Z", (void*) android_net_wifi_setMode},
 };
 
