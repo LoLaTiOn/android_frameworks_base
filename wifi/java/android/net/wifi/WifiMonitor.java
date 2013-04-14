@@ -661,12 +661,6 @@ public class WifiMonitor {
          * id=network-id state=new-state
          */
         private void handleSupplicantStateChange(String dataString) {
-            WifiSsid wifiSsid = null;
-			int index = dataString.indexOf("SSID=");
-            if (index != -1) {
-                wifiSsid = WifiSsid.createFromAsciiEncoded(
-                        dataString.substring(index));
-            }
             String[] dataTokens = dataString.split(" ");
 
             String BSSID = null;
@@ -687,6 +681,7 @@ public class WifiMonitor {
                 try {
                     value = Integer.parseInt(nameValue[1]);
                 } catch (NumberFormatException e) {
+					Log.w(TAG, "STATE-CHANGE non-integer parameter: " + token);
                     continue;
                 }
 
@@ -709,7 +704,7 @@ public class WifiMonitor {
             if (newSupplicantState == SupplicantState.INVALID) {
                 Log.w(TAG, "Invalid supplicant state: " + newState);
             }
-            notifySupplicantStateChange(networkId, wifiSsid, BSSID, newSupplicantState);
+            notifySupplicantStateChange(networkId, BSSID, newSupplicantState);
         }
     }
 
@@ -758,14 +753,12 @@ public class WifiMonitor {
      * Send the state machine a notification that the state of the supplicant
      * has changed.
      * @param networkId the configured network on which the state change occurred
-     * @param wifiSsid network name
-     * @param BSSID network address
      * @param newState the new {@code SupplicantState}
      */
-    void notifySupplicantStateChange(int networkId, WifiSsid wifiSsid, String BSSID,
+    void notifySupplicantStateChange(int networkId, String BSSID,
             SupplicantState newState) {
         mStateMachine.sendMessage(mStateMachine.obtainMessage(SUPPLICANT_STATE_CHANGE_EVENT,
-                new StateChangeResult(networkId, wifiSsid, BSSID, newState)));
+                new StateChangeResult(networkId, BSSID, newState)));
     }
 
     /**

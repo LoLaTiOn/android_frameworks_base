@@ -23,16 +23,14 @@
  * @hide
  */
 public class StateChangeResult {
-    StateChangeResult(int networkId, WifiSsid wifiSsid, String BSSID,
+    StateChangeResult(int networkId, String BSSID,
             SupplicantState state) {
         this.state = state;
-        this.wifiSsid= wifiSsid;
         this.BSSID = BSSID;
         this.networkId = networkId;
     }
 
     int networkId;
-    WifiSsid wifiSsid;
     String BSSID;
     SupplicantState state;
 }
