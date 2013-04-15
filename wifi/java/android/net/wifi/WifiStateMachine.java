@@ -1566,7 +1566,7 @@ public class WifiStateMachine extends StateMachine {
         }
     }
 
-	private String fetchSSID() {
+	private WifiSsid fetchSSID() {
         String status = mWifiNative.status();
         if (status == null) {
             return null;
@@ -1578,7 +1578,7 @@ public class WifiStateMachine extends StateMachine {
             if (prop.length < 2) continue;
             String name = prop[0];
             String value = prop[1];
-            if (name.equalsIgnoreCase("ssid")) return value;
+            if (name.equalsIgnoreCase("ssid")) return WifiSsid.createFromAsciiEncoded(value);
         }
         return null;
     }
